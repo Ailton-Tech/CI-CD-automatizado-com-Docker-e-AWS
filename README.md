@@ -1,207 +1,471 @@
 # 🚀 DevOps AWS API
 
-**API REST com Java 21 e Spring Boot | Projeto prático de DevOps e Cloud Computing**
+**Java 21 | Spring Boot | Docker | CI/CD | AWS | SRE**
 
 ![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-Framework-6DB33F?logo=springboot&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.2.0-6DB33F?logo=springboot&logoColor=white)
 ![Maven](https://img.shields.io/badge/Maven-Build-C71A36?logo=apachemaven)
+![Docker](https://img.shields.io/badge/Docker-Container-2496ED?logo=docker&logoColor=white)
+![JUnit](https://img.shields.io/badge/JUnit-5-25A162?logo=junit5)
+![GitHub](https://img.shields.io/badge/GitHub-Version_Control-181717?logo=github)
 ![Status](https://img.shields.io/badge/Status-Em_Desenvolvimento-yellow)
 
 ## 📌 Sobre o projeto
 
-O **DevOps AWS API** é um projeto de desenvolvimento e infraestrutura criado para demonstrar, na prática, conhecimentos em desenvolvimento backend, automação de processos, integração contínua, entrega contínua e computação em nuvem.
+O **DevOps AWS API** é um projeto prático voltado ao desenvolvimento backend, automação de infraestrutura, integração contínua, entrega contínua, computação em nuvem e confiabilidade de sistemas (SRE).
 
-A aplicação utiliza Java 21 e Spring Boot, com evolução planejada para uma arquitetura baseada em containers Docker, pipelines GitHub Actions e infraestrutura AWS.
+A aplicação foi desenvolvida utilizando Java 21 e Spring Boot, com testes automatizados, versionamento Git e containerização Docker utilizando a estratégia Multi-stage Build.
 
-### Objetivos
+O projeto evoluirá para uma arquitetura em nuvem AWS, com pipelines automatizados e monitoramento de aplicações.
 
-- Desenvolver uma API REST com Spring Boot.
-- Implementar testes automatizados.
-- Containerizar a aplicação com Docker.
-- Automatizar build e testes utilizando GitHub Actions.
-- Publicar a aplicação na AWS.
-- Implementar monitoramento e observabilidade.
+## 🎯 Objetivos
 
-## 🏗️ Arquitetura planejada
+- Desenvolver uma API REST utilizando Java e Spring Boot.
+- Implementar testes automatizados com JUnit e MockMvc.
+- Aplicar boas práticas de versionamento com Git e GitHub.
+- Containerizar a aplicação utilizando Docker.
+- Automatizar processos de build, testes e deploy.
+- Implantar a aplicação na AWS.
+- Implementar práticas de observabilidade e SRE.
 
-```text
-Developer
-    |
-    v
-GitHub Repository
-    |
-    v
-GitHub Actions (CI/CD)
-    |
-    v
-Maven Build + JUnit Tests
-    |
-    v
-Docker Image
-    |
-    v
-Amazon ECR
-    |
-    v
-Amazon ECS / AWS Fargate
-    |
-    v
-Spring Boot REST API
-    |
-    v
-Amazon CloudWatch
+## 🏗️ Arquitetura do projeto
+
+```mermaid
+flowchart LR
+    A[Desenvolvedor] --> B[GitHub]
+    B --> C[GitHub Actions]
+    C --> D[Maven Build]
+    D --> E[JUnit Tests]
+    E --> F[Docker Image]
+    F --> G[Amazon ECR]
+    G --> H[Amazon ECS Fargate]
+    H --> I[Spring Boot API]
+    H --> J[Amazon CloudWatch]
 ```
 
-> **Nota:** A arquitetura acima representa a evolução planejada. Atualmente, a API está funcionando localmente.
+A arquitetura representa o fluxo completo planejado para o projeto, desde o desenvolvimento local até a implantação e o monitoramento na AWS.
+
+Atualmente, a aplicação possui testes automatizados e containerização Docker local.
 
 ## 🛠️ Stack tecnológica
 
-| Categoria | Tecnologia |
-|---|---|
-| Linguagem | Java 21 |
-| Framework | Spring Boot |
-| Gerenciador de dependências | Maven |
-| API | Spring Web |
-| Desenvolvimento | IntelliJ IDEA |
-| Testes planejados | JUnit 5 |
-| Containers planejados | Docker |
-| CI/CD planejado | GitHub Actions |
-| Cloud planejada | Amazon Web Services |
-| Monitoramento planejado | Amazon CloudWatch |
+| Categoria | Tecnologia | Status |
+|---|---|---|
+| Linguagem | Java 21 | Implementado |
+| Framework | Spring Boot 4.2.0 | Implementado |
+| API REST | Spring Web MVC | Implementado |
+| Build | Apache Maven | Implementado |
+| Testes | JUnit 5 e MockMvc | Implementado |
+| Versionamento | Git e GitHub | Implementado |
+| Containers | Docker | Implementado |
+| Build de containers | Multi-stage Build | Implementado |
+| IDE | IntelliJ IDEA | Utilizado |
+| CI/CD | GitHub Actions | Planejado |
+| Container Registry | Amazon ECR | Planejado |
+| Orquestração | Amazon ECS Fargate | Planejado |
+| Observabilidade | Amazon CloudWatch | Planejado |
 
 ## 📂 Estrutura do projeto
 
 ```text
-devops-aws-api/
+devpos-aws-api/
+├── .mvn/
 ├── src/
 │   ├── main/
 │   │   ├── java/
-│   │   │   └── com/devops/
-│   │   │       └── devops_aws_api/
-│   │   │           ├── DevopsAwsApiApplication.java
-│   │   │           └── controller/
-│   │   │               └── HelloController.java
+│   │   │   └── com/devops/devpos_aws_api/
+│   │   │       ├── DevposAwsApiApplication.java
+│   │   │       └── controller/
+│   │   │           └── HelloController.java
 │   │   └── resources/
 │   │       └── application.properties
 │   └── test/
-├── pom.xml
+│       └── java/
+│           └── com/devops/devpos_aws_api/
+│               ├── DevposAwsApiApplicationTests.java
+│               └── controller/
+│                   └── HelloControllerTest.java
+├── .dockerignore
+├── .gitattributes
+├── .gitignore
+├── Dockerfile
 ├── mvnw
 ├── mvnw.cmd
+├── pom.xml
 └── README.md
 ```
-
-*O caminho do pacote Java deve corresponder ao pacote gerado no seu projeto.*
 
 ## ⚙️ Executando localmente
 
 ### Pré-requisitos
 
 - Java JDK 21
-- IntelliJ IDEA ou terminal
-- Maven Wrapper incluído no projeto
+- Git
+- Docker Desktop
+- IntelliJ IDEA (opcional)
+- Maven Wrapper
 
-### 1. Abrir o projeto
+### Configuração da aplicação
 
-Abra a pasta `devops-aws-api` no IntelliJ IDEA e aguarde o carregamento das dependências Maven.
-
-### 2. Configurar a aplicação
-
-No arquivo `src/main/resources/application.properties`, configure:
+Arquivo `src/main/resources/application.properties`:
 
 ```properties
 server.port=8081
 ```
 
-### 3. Executar
-
-Execute a classe `DevopsAwsApiApplication` pelo IntelliJ.
-
-Alternativamente, no Windows, execute na raiz do projeto:
+### Executar com Maven no Windows
 
 ```powershell
 .\mvnw.cmd spring-boot:run
 ```
 
-### 4. Acessar a API
+### Executar com Maven no Linux
 
-```http
-GET http://localhost:8081/hello
+```bash
+./mvnw spring-boot:run
 ```
 
-**Resposta esperada:**
+### Acessar a aplicação
 
 ```text
-Olá! Minha API DevOps AWS está funcionando!
+http://localhost:8081/hello
 ```
 
 ## 🌐 Documentação da API
 
-| Método | Endpoint | Descrição | Status esperado |
+| Método | Endpoint | Descrição | Status |
 |---|---|---|---|
-| GET | `/hello` | Retorna mensagem de confirmação | 200 OK |
+| GET | `/hello` | Verifica a resposta da aplicação | 200 OK |
 
-Exemplo com cURL:
+### Exemplo de requisição
 
 ```bash
 curl http://localhost:8081/hello
 ```
 
+### Resposta esperada
+
+```text
+Olá! Minha API DevOps AWS está funcionando!
+```
+
 ## 🧪 Testes automatizados
 
-A implementação de testes unitários e de integração com JUnit 5 está prevista para as próximas etapas.
+A aplicação possui testes automatizados utilizando JUnit 5 e MockMvc, permitindo validar o comportamento do endpoint REST sem iniciar um servidor HTTP real.
 
-Os testes serão integrados ao pipeline de CI para validar o projeto antes da publicação.
+### Validações implementadas
 
-## 🔄 CI/CD — Planejamento
+- Disponibilidade da rota `/hello` no ambiente de testes.
+- Validação do status HTTP 200.
+- Validação do conteúdo retornado pela API.
 
-O pipeline GitHub Actions será responsável por:
+### Executar todos os testes no Windows
 
-1. Fazer checkout do código-fonte.
-2. Configurar o ambiente Java 21.
-3. Compilar a aplicação com Maven.
-4. Executar testes automatizados.
-5. Construir a imagem Docker.
-6. Publicar a imagem no Amazon ECR.
-7. Implantar a aplicação no Amazon ECS.
+```powershell
+.\mvnw.cmd test
+```
 
-A implantação dependerá da configuração das permissões e credenciais AWS necessárias.
+### Executar todos os testes no Linux
 
-## 📊 Roadmap do projeto
+```bash
+./mvnw test
+```
 
-- [x] Inicialização do projeto Spring Boot
+### Resultado do teste do controller
+
+| Indicador | Resultado |
+|---|---|
+| Testes executados | 1 |
+| Testes aprovados | 1 |
+| Falhas | 0 |
+| Status | PASSED |
+
+## 🐳 Containerização com Docker
+
+A aplicação utiliza Docker com a estratégia Multi-stage Build, separando o ambiente de compilação do ambiente de execução.
+
+### Arquitetura do container
+
+```mermaid
+flowchart TD
+    A[Código-fonte Java] --> B[Maven + JDK 21]
+    B --> C[Compilação e testes]
+    C --> D[Arquivo JAR]
+    D --> E[Java 21 JRE]
+    E --> F[Imagem Docker]
+    F --> G[Container Spring Boot]
+    G --> H[Porta 8081]
+```
+
+### Dockerfile
+
+```dockerfile
+# Stage 1 - Build
+FROM maven:3.9-eclipse-temurin-21 AS build
+
+WORKDIR /app
+
+COPY pom.xml .
+COPY src ./src
+
+RUN mvn clean package
+
+# Stage 2 - Runtime
+FROM eclipse-temurin:21-jre
+
+WORKDIR /app
+
+COPY --from=build /app/target/*.jar app.jar
+
+EXPOSE 8081
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
+```
+
+### Benefícios do Multi-stage Build
+
+- Separação entre compilação e execução.
+- Redução do tamanho da imagem final.
+- Execução dos testes durante o build.
+- Ausência do Maven na imagem de execução.
+- Portabilidade entre ambientes.
+- Preparação para implantação na AWS.
+
+### Construir a imagem Docker
+
+Execute na pasta que contém o Dockerfile e o pom.xml:
+
+```bash
+docker build -t devops-aws-api:1.0 .
+```
+
+### Listar imagens disponíveis
+
+```bash
+docker images
+```
+
+### Executar o container
+
+```bash
+docker run -d --name devops-api -p 8081:8081 devops-aws-api:1.0
+```
+
+### Verificar containers em execução
+
+```bash
+docker ps
+```
+
+### Consultar logs da aplicação
+
+```bash
+docker logs devops-api
+```
+
+### Acompanhar logs em tempo real
+
+```bash
+docker logs -f devops-api
+```
+
+### Parar o container
+
+```bash
+docker stop devops-api
+```
+
+### Reiniciar o container
+
+```bash
+docker start devops-api
+```
+
+### Remover o container
+
+```bash
+docker rm devops-api
+```
+
+O container deverá estar parado antes da remoção.
+
+### Acessar a API containerizada
+
+```text
+http://localhost:8081/hello
+```
+
+Certifique-se de que nenhuma outra aplicação esteja utilizando a porta 8081.
+
+## 🔄 CI/CD — GitHub Actions
+
+**Status: próxima etapa de implementação.**
+
+O pipeline será responsável por automatizar o ciclo de integração e entrega da aplicação.
+
+```mermaid
+flowchart LR
+    A[Git Push] --> B[GitHub Actions]
+    B --> C[Build Maven]
+    C --> D[Testes JUnit]
+    D --> E[Docker Build]
+    E --> F[Amazon ECR]
+    F --> G[Deploy ECS]
+```
+
+### Etapas planejadas
+
+- Checkout do código-fonte.
+- Configuração do Java 21.
+- Compilação da aplicação.
+- Execução dos testes automatizados.
+- Construção da imagem Docker.
+- Autenticação segura na AWS.
+- Publicação da imagem no Amazon ECR.
+- Deploy automatizado no Amazon ECS Fargate.
+
+## ☁️ Infraestrutura AWS
+
+**Status: planejado.**
+
+| Serviço | Responsabilidade |
+|---|---|
+| Amazon ECR | Armazenamento de imagens Docker |
+| Amazon ECS | Gerenciamento dos containers |
+| AWS Fargate | Execução de containers sem gerenciamento de servidores |
+| Amazon CloudWatch | Logs, métricas e alertas |
+| AWS IAM | Gerenciamento de identidades e permissões |
+| Amazon VPC | Isolamento e configuração de rede |
+| Application Load Balancer | Distribuição de tráfego HTTP |
+
+## 📡 Observabilidade e SRE
+
+**Status: planejado.**
+
+A evolução do projeto incluirá práticas de Site Reliability Engineering para garantir maior confiabilidade e visibilidade operacional.
+
+- Monitoramento de disponibilidade.
+- Health checks com Spring Boot Actuator.
+- Monitoramento de latência.
+- Monitoramento de erros HTTP.
+- Métricas de CPU e memória.
+- Centralização de logs.
+- Alarmes com Amazon CloudWatch.
+- Definição de SLI, SLO e SLA.
+- Estratégias de recuperação e rollback.
+- Documentação de incidentes.
+
+## 📊 Roadmap
+
+### Fase 1 — Desenvolvimento
+
+- [x] Criação do projeto Spring Boot
 - [x] Configuração do Java 21
-- [x] Implementação do primeiro endpoint REST
-- [x] Execução e validação local da API
-- [x] Documentação inicial
-- [ ] Implementação de testes com JUnit
-- [ ] Criação do Dockerfile
-- [ ] Execução com Docker
-- [ ] Versionamento e publicação no GitHub
-- [ ] Pipeline CI/CD com GitHub Actions
-- [ ] Publicação de imagens no Amazon ECR
-- [ ] Deploy no Amazon ECS com Fargate
-- [ ] Monitoramento com Amazon CloudWatch
-- [ ] Configuração de métricas, logs e alertas
+- [x] Desenvolvimento da API REST
+- [x] Configuração da porta 8081
+- [x] Validação do endpoint local
 
-## 🔐 Boas práticas previstas
+### Fase 2 — Versionamento
 
-- Gerenciamento seguro de credenciais e permissões IAM.
-- Utilização de variáveis de ambiente.
-- Aplicação do princípio do menor privilégio.
-- Automação de testes e validações.
-- Monitoramento de disponibilidade e erros.
-- Documentação e versionamento de alterações.
+- [x] Configuração do Git
+- [x] Criação do repositório GitHub
+- [x] Publicação inicial do código-fonte
+- [x] Configuração do .gitignore
+- [x] Documentação do projeto
 
-## 📈 Aprendizados
+### Fase 3 — Qualidade de software
 
-O projeto tem como propósito consolidar conhecimentos em desenvolvimento Java, APIs REST, Git, Docker, CI/CD, serviços AWS e práticas de confiabilidade de sistemas.
+- [x] Configuração do JUnit
+- [x] Implementação do MockMvc
+- [x] Teste automatizado do controller
+- [x] Validação do status HTTP
+- [x] Validação do conteúdo da resposta
+
+### Fase 4 — Docker
+
+- [x] Configuração do Dockerfile
+- [x] Configuração do .dockerignore
+- [x] Implementação do Multi-stage Build
+- [x] Construção da imagem Docker
+- [x] Configuração do mapeamento de portas
+- [x] Inicialização do container
+- [ ] Confirmação final do endpoint containerizado
+- [ ] Publicação das alterações no GitHub
+
+### Fase 5 — CI/CD
+
+- [ ] Configuração do GitHub Actions
+- [ ] Automação de build
+- [ ] Automação de testes
+- [ ] Automação da construção da imagem Docker
+- [ ] Configuração do pipeline de deploy
+
+### Fase 6 — AWS Cloud
+
+- [ ] Configuração do Amazon ECR
+- [ ] Publicação da imagem Docker
+- [ ] Configuração do Amazon ECS
+- [ ] Configuração do AWS Fargate
+- [ ] Configuração de rede e segurança
+- [ ] Deploy da aplicação
+
+### Fase 7 — SRE e Observabilidade
+
+- [ ] Configuração do Spring Boot Actuator
+- [ ] Configuração do Amazon CloudWatch
+- [ ] Monitoramento de métricas
+- [ ] Centralização de logs
+- [ ] Configuração de alarmes
+- [ ] Definição de SLI e SLO
+- [ ] Simulação e análise de incidentes
+
+## 🔐 Segurança e boas práticas
+
+### Implementadas
+
+- Exclusão de arquivos desnecessários do versionamento.
+- Configuração do .gitignore.
+- Configuração do .dockerignore.
+- Separação dos ambientes de build e runtime.
+- Testes automatizados.
+- Versionamento da imagem Docker.
+
+### Planejadas
+
+- Execução do container com usuário não privilegiado.
+- Gerenciamento seguro de credenciais.
+- Autenticação AWS com GitHub Actions via OIDC.
+- Princípio do menor privilégio com IAM.
+- Análise de vulnerabilidades em imagens Docker.
+- Gerenciamento de variáveis de ambiente.
+- Monitoramento e alertas operacionais.
+
+## 📚 Conhecimentos aplicados
+
+- Desenvolvimento backend com Java.
+- APIs REST com Spring Boot.
+- Testes automatizados.
+- Versionamento de código.
+- Containerização de aplicações.
+- Multi-stage Build.
+- Gerenciamento de imagens e containers.
+- Análise de logs e troubleshooting.
+- Fundamentos de DevOps e SRE.
+
+## 👨‍💻 Autor
+
+**Ailton Ferreira da Cruz Junior**
+
+Projeto desenvolvido para aprimoramento profissional nas áreas de Software Engineering, DevOps, Cloud Computing e Site Reliability Engineering.
+
+GitHub: [Ailton-Tech](https://github.com/Ailton-Tech)
 
 ## 📄 Licença
 
-A licença do projeto será definida antes de sua distribuição pública.
+Licença a definir.
 
 ---
 
-**Status do projeto:** Em desenvolvimento.
+**Status:** Em desenvolvimento.
 
-**Próxima entrega:** Testes automatizados com JUnit 5 e containerização com Docker.
+**Próxima etapa:** Implementação do pipeline CI/CD com GitHub Actions.
