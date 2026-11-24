@@ -1,0 +1,11 @@
+
+target/
+.idea/
+.git/
+.github/
+*.iml
+*.log
+.env
+.env.*
+docs/
+README.md
