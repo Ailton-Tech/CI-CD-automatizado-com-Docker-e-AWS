@@ -1,15 +1,87 @@
 
-- name: Diagnosticar identidade OIDC
-  if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
-  uses: actions/github-script@v8
-  with:
-    script: |
-      const token = await core.getIDToken('sts.amazonaws.com');
-      const claims = JSON.parse(
-        Buffer.from(token.split('.')[1], 'base64url').toString()
-      );
-      console.log('Issuer:', claims.iss);
-      console.log('Audience:', claims.aud);
-      console.log('Subject:', claims.sub);
-      console.log('Repository:', claims.repository);
-      console.log('Ref:', claims.ref);
+name: DevOps AWS API - CI/CD
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: devops-aws-api
+
+jobs:
+  build-and-test:
+    name: Build, Test and Docker
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: devpos-aws-api
+
+    steps:
+      - name: Checkout do codigo
+        uses: actions/checkout@v5
+
+      - name: Configurar Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: devpos-aws-api/pom.xml
+
+      - name: Compilar e executar testes
+        run: mvn -B clean verify
+
+      - name: Construir imagem Docker
+        run: docker build -t devops-aws-api:1.0 .
+
+      - name: Diagnosticar identidade OIDC
+        if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const token = await core.getIDToken('sts.amazonaws.com');
+            const claims = JSON.parse(
+              Buffer.from(token.split('.')[1], 'base64url').toString()
+            );
+            console.log('Issuer:', claims.iss);
+            console.log('Audience:', claims.aud);
+            console.log('Subject:', claims.sub);
+            console.log('Repository:', claims.repository);
+            console.log('Ref:', claims.ref);
+
+      - name: Configurar credenciais AWS via OIDC
+        if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: arn:aws:iam::399747939250:role/GitHubActionsECRRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Validar identidade AWS
+        if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+        run: aws sts get-caller-identity
+
+      - name: Login no Amazon ECR
+        if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Enviar imagem para o ECR
+        if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker tag devops-aws-api:1.0 $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker tag devops-aws-api:1.0 $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
