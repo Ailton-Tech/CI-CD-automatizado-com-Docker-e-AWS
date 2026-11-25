@@ -1,5 +1,5 @@
 
-name: DevOps AWS API - CI
+name: DevOps AWS API - CI/CD
 
 on:
   push:
@@ -10,6 +10,11 @@ on:
 
 permissions:
   contents: read
+  id-token: write
+
+env:
+  AWS_REGION: us-east-2
+  ECR_REPOSITORY: devops-aws-api
 
 jobs:
   build-and-test:
@@ -38,5 +43,26 @@ jobs:
       - name: Construir imagem Docker
         run: docker build -t devops-aws-api:1.0 .
 
-      - name: Verificar imagem Docker
-        run: docker images
+      - name: Configurar credenciais AWS
+        if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::399747939250:role/GitHubActionsECRRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login no Amazon ECR
+        if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Enviar imagem para o ECR
+        if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker tag devops-aws-api:1.0 $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker tag devops-aws-api:1.0 $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
