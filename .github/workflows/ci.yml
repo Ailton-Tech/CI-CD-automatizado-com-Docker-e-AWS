@@ -13,7 +13,7 @@ permissions:
   id-token: write
 
 env:
-  AWS_REGION: us-east-2
+  AWS_REGION: us-east-1
   ECR_REPOSITORY: devops-aws-api
 
 jobs:
@@ -27,10 +27,10 @@ jobs:
 
     steps:
       - name: Checkout do codigo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Configurar Java 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
@@ -43,12 +43,16 @@ jobs:
       - name: Construir imagem Docker
         run: docker build -t devops-aws-api:1.0 .
 
-      - name: Configurar credenciais AWS
+      - name: Configurar credenciais AWS via OIDC
         if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: arn:aws:iam::399747939250:role/GitHubActionsECRRole
           aws-region: ${{ env.AWS_REGION }}
+
+      - name: Validar identidade AWS
+        if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+        run: aws sts get-caller-identity
 
       - name: Login no Amazon ECR
         if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
