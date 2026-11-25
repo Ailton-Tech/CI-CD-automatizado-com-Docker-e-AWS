@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Configurar credenciais AWS via OIDC
+      - name: Configurar credenciais AWS
         uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: arn:aws:iam::399747939250:role/GitHubActionsECRRole
@@ -22,5 +22,5 @@ jobs:
       - name: Validar identidade AWS
         run: aws sts get-caller-identity
 
-      - name: Testar login no Amazon ECR
+      - name: Login no Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
