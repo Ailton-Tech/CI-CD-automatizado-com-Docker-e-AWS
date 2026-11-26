@@ -8,6 +8,8 @@
 ![Docker](https://img.shields.io/badge/Docker-Container-2496ED?logo=docker&logoColor=white)
 ![JUnit](https://img.shields.io/badge/JUnit-5-25A162?logo=junit5)
 ![GitHub](https://img.shields.io/badge/GitHub-Version_Control-181717?logo=github)
+![AWS](https://img.shields.io/badge/AWS-ECS_Fargate-FF9900?logo=amazonwebservices)
+![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions)
 ![Status](https://img.shields.io/badge/Status-Em_Desenvolvimento-yellow)
 
 ## 📌 Sobre o projeto
@@ -16,7 +18,7 @@ O **DevOps AWS API** é um projeto prático voltado ao desenvolvimento backend, 
 
 A aplicação foi desenvolvida utilizando Java 21 e Spring Boot, com testes automatizados, versionamento Git e containerização Docker utilizando a estratégia Multi-stage Build.
 
-O projeto evoluirá para uma arquitetura em nuvem AWS, com pipelines automatizados e monitoramento de aplicações.
+A aplicação já foi implantada no Amazon ECS Fargate, com publicação automatizada de imagens no Amazon ECR via GitHub Actions e autenticação federada OIDC. A integração com o Application Load Balancer e a evolução das práticas de SRE estão em andamento.
 
 ## 🎯 Objetivos
 
@@ -34,18 +36,20 @@ O projeto evoluirá para uma arquitetura em nuvem AWS, com pipelines automatizad
 flowchart LR
     A[Desenvolvedor] --> B[GitHub]
     B --> C[GitHub Actions]
-    C --> D[Maven Build]
-    D --> E[JUnit Tests]
-    E --> F[Docker Image]
+    C --> D[Maven Build e JUnit]
+    D --> E[Docker Build]
+    C --> F[AWS IAM / STS via OIDC]
     F --> G[Amazon ECR]
+    E --> G
     G --> H[Amazon ECS Fargate]
-    H --> I[Spring Boot API]
-    H --> J[Amazon CloudWatch]
+    U[Cliente HTTP] -. Integracao em andamento .-> L[Application Load Balancer]
+    L -.-> T[Target Group IP :8081]
+    T -.-> H
+    H --> I[Spring Boot API :8081]
+    H -. Logs configurados .-> J[Amazon CloudWatch]
 ```
 
-A arquitetura representa o fluxo completo planejado para o projeto, desde o desenvolvimento local até a implantação e o monitoramento na AWS.
-
-Atualmente, a aplicação possui testes automatizados e containerização Docker local.
+As linhas tracejadas representam integrações configuradas ou em andamento, ainda pendentes de validação operacional. A API já respondeu com sucesso pelo IP público da tarefa ECS. O deploy inicial foi realizado pelo console AWS; a automação do deploy ECS permanece pendente.
 
 ## 🛠️ Stack tecnológica
 
@@ -60,39 +64,47 @@ Atualmente, a aplicação possui testes automatizados e containerização Docker
 | Containers | Docker | Implementado |
 | Build de containers | Multi-stage Build | Implementado |
 | IDE | IntelliJ IDEA | Utilizado |
-| CI/CD | GitHub Actions | Planejado |
-| Container Registry | Amazon ECR | Planejado |
-| Orquestração | Amazon ECS Fargate | Planejado |
-| Observabilidade | Amazon CloudWatch | Planejado |
+| CI/CD | GitHub Actions | Implementado (CI e publicação ECR) |
+| Container Registry | Amazon ECR | Implementado |
+| Orquestração | Amazon ECS Fargate | Implementado |
+| Observabilidade | Amazon CloudWatch | Logs configurados; validação pendente |
+| Autenticação federada | IAM / STS / OIDC | Implementado |
+| Balanceamento | Application Load Balancer | Criado; integração pendente |
+| Rede | VPC e Security Groups | Implementado |
 
 ## 📂 Estrutura do projeto
 
 ```text
-devpos-aws-api/
-├── .mvn/
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/devops/devpos_aws_api/
-│   │   │       ├── DevposAwsApiApplication.java
-│   │   │       └── controller/
-│   │   │           └── HelloController.java
-│   │   └── resources/
-│   │       └── application.properties
-│   └── test/
-│       └── java/
-│           └── com/devops/devpos_aws_api/
-│               ├── DevposAwsApiApplicationTests.java
-│               └── controller/
-│                   └── HelloControllerTest.java
-├── .dockerignore
-├── .gitattributes
+raiz-do-repositorio/
+├── .github/
+│   └── workflows/
+│       └── ci.yml
 ├── .gitignore
-├── Dockerfile
-├── mvnw
-├── mvnw.cmd
-├── pom.xml
-└── README.md
+└── devpos-aws-api/
+    ├── .mvn/
+    ├── src/
+    │   ├── main/
+    │   │   ├── java/
+    │   │   │   └── com/devops/devpos_aws_api/
+    │   │   │       ├── DevposAwsApiApplication.java
+    │   │   │       └── controller/
+    │   │   │           └── HelloController.java
+    │   │   └── resources/
+    │   │       └── application.properties
+    │   └── test/
+    │       └── java/
+    │           └── com/devops/devpos_aws_api/
+    │               ├── DevposAwsApiApplicationTests.java
+    │               └── controller/
+    │                   └── HelloControllerTest.java
+    ├── .dockerignore
+    ├── .gitattributes
+    ├── .gitignore
+    ├── Dockerfile
+    ├── mvnw
+    ├── mvnw.cmd
+    ├── pom.xml
+    └── README.md
 ```
 
 ## ⚙️ Executando localmente
@@ -299,48 +311,77 @@ Certifique-se de que nenhuma outra aplicação esteja utilizando a porta 8081.
 
 ## 🔄 CI/CD — GitHub Actions
 
-**Status: próxima etapa de implementação.**
+**Status:** integração contínua e publicação no ECR implementadas; deploy automatizado no ECS pendente.
 
-O pipeline será responsável por automatizar o ciclo de integração e entrega da aplicação.
+Workflow: `.github/workflows/ci.yml`, branch `master`.
 
 ```mermaid
 flowchart LR
     A[Git Push] --> B[GitHub Actions]
-    B --> C[Build Maven]
-    C --> D[Testes JUnit]
-    D --> E[Docker Build]
-    E --> F[Amazon ECR]
-    F --> G[Deploy ECS]
+    B --> C[Build Maven e testes]
+    C --> D[Docker Build]
+    D --> E[Autenticacao AWS OIDC]
+    E --> F[Login ECR]
+    F --> G[Push da imagem]
+    G -. Futuro CD .-> H[Deploy ECS]
 ```
 
-### Etapas planejadas
-
-- Checkout do código-fonte.
-- Configuração do Java 21.
-- Compilação da aplicação.
-- Execução dos testes automatizados.
+- Checkout do código e configuração do Java 21.
+- Compilação e testes automatizados com Maven.
 - Construção da imagem Docker.
-- Autenticação segura na AWS.
-- Publicação da imagem no Amazon ECR.
-- Deploy automatizado no Amazon ECS Fargate.
+- Autenticação AWS via OIDC e credenciais temporárias STS.
+- Login e publicação da imagem no Amazon ECR.
+- Próxima evolução: atualização automatizada do serviço ECS e verificação de estabilidade.
+
+O erro `sts:AssumeRoleWithWebIdentity` foi investigado mediante diagnóstico da identidade OIDC e resolvido na etapa de autenticação. Não são necessárias chaves AWS permanentes no workflow OIDC.
 
 ## ☁️ Infraestrutura AWS
 
-**Status: planejado.**
+Região: `us-east-1` (Norte da Virgínia).
 
-| Serviço | Responsabilidade |
-|---|---|
-| Amazon ECR | Armazenamento de imagens Docker |
-| Amazon ECS | Gerenciamento dos containers |
-| AWS Fargate | Execução de containers sem gerenciamento de servidores |
-| Amazon CloudWatch | Logs, métricas e alertas |
-| AWS IAM | Gerenciamento de identidades e permissões |
-| Amazon VPC | Isolamento e configuração de rede |
-| Application Load Balancer | Distribuição de tráfego HTTP |
+| Recurso | Configuração | Status |
+|---|---|---|
+| Amazon ECR | Registro privado de imagens | Implementado |
+| ECS Cluster | `devops-aws-cluster` | Ativo |
+| ECS Service | `devops-aws-service` | Implantado |
+| Task Definition | `devops-aws-task:1` | Ativa |
+| AWS Fargate | 0,25 vCPU / 1 GiB | Em execução na validação |
+| Contêiner | `devops-api`, Linux/x86_64, porta 8081 | Implementado |
+| Rede | VPC, modo awsvpc | Implementado |
+| IAM | `ecsTaskExecutionRole` e autenticação OIDC | Implementado |
+| Security Group API | `devops-api-sg` | Criado |
+| Security Group ALB | `devops-alb-sg` | Criado |
+| Target Group | `devops-api-tg`, IP, HTTP:8081 | Criado |
+| ALB | `devops-aws-alb`, internet-facing, IPv4 | Criado; integração pendente |
+| CloudWatch Logs | `/ecs/devops-aws-task` | Configurado; validação pendente |
+
+### Validação da implantação
+
+O serviço ECS apresentou implantação bem-sucedida, com uma tarefa em execução e nenhuma pendente. O endpoint `/hello` respondeu pelo IP público da tarefa com a mensagem esperada.
+
+```bash
+curl http://<IP_PUBLICO_DA_TAREFA>:8081/hello
+```
+
+O IP da tarefa pode mudar. Após a integração do ALB, o teste será realizado por seu DNS:
+
+```bash
+curl http://<DNS_DO_ALB>/hello
+```
+
+### Balanceamento de carga
+
+O ALB foi criado em quatro zonas de disponibilidade. O Target Group utiliza destinos do tipo IP, necessários para tarefas Fargate em modo awsvpc, e verificação de integridade HTTP no caminho `/hello`.
+
+Ainda é necessário confirmar o listener HTTP:80, associar o Target Group ao serviço ECS e validar destinos íntegros e acesso pelo DNS. Após essa validação, remover a regra de acesso direto à API pelo IP pessoal, mantendo a entrada TCP 8081 proveniente do Security Group do ALB.
+
+### Custos do laboratório
+
+Fargate, ALB, IPv4 público, armazenamento ECR e CloudWatch podem gerar cobranças. Ao terminar os testes, reduzir a quantidade desejada de tarefas a zero e excluir o ALB se não for mais necessário. Revisar também imagens e logs armazenados. A redução das tarefas não interrompe as cobranças do ALB.
 
 ## 📡 Observabilidade e SRE
 
-**Status: planejado.**
+**Status: configuração inicial de logs realizada; validação e monitoramento avançado pendentes.**
 
 A evolução do projeto incluirá práticas de Site Reliability Engineering para garantir maior confiabilidade e visibilidade operacional.
 
@@ -390,29 +431,35 @@ A evolução do projeto incluirá práticas de Site Reliability Engineering para
 - [x] Configuração do mapeamento de portas
 - [x] Inicialização do container
 - [ ] Confirmação final do endpoint containerizado
-- [ ] Publicação das alterações no GitHub
+- [x] Publicação das alterações no GitHub
 
 ### Fase 5 — CI/CD
 
-- [ ] Configuração do GitHub Actions
-- [ ] Automação de build
-- [ ] Automação de testes
-- [ ] Automação da construção da imagem Docker
-- [ ] Configuração do pipeline de deploy
+- [x] Configuração do GitHub Actions
+- [x] Automação de build
+- [x] Automação de testes
+- [x] Automação da construção da imagem Docker
+- [x] Autenticação AWS via OIDC e publicação automatizada no ECR
+- [ ] Configuração do pipeline de deploy automatizado no ECS
 
 ### Fase 6 — AWS Cloud
 
-- [ ] Configuração do Amazon ECR
-- [ ] Publicação da imagem Docker
-- [ ] Configuração do Amazon ECS
-- [ ] Configuração do AWS Fargate
-- [ ] Configuração de rede e segurança
-- [ ] Deploy da aplicação
+- [x] Configuração do Amazon ECR
+- [x] Publicação da imagem Docker
+- [x] Configuração do Amazon ECS
+- [x] Configuração do AWS Fargate
+- [x] Configuração de rede e segurança
+- [x] Deploy inicial da aplicação pelo console AWS
+- [x] Validação do endpoint na tarefa ECS
+- [x] Criação do Target Group e ALB
+- [ ] Associação do ALB ao serviço ECS
+- [ ] Validação do Health Check e acesso pelo DNS do ALB
 
 ### Fase 7 — SRE e Observabilidade
 
 - [ ] Configuração do Spring Boot Actuator
-- [ ] Configuração do Amazon CloudWatch
+- [x] Configuração inicial do driver de logs CloudWatch
+- [ ] Validação dos logs no CloudWatch
 - [ ] Monitoramento de métricas
 - [ ] Centralização de logs
 - [ ] Configuração de alarmes
@@ -429,13 +476,14 @@ A evolução do projeto incluirá práticas de Site Reliability Engineering para
 - Separação dos ambientes de build e runtime.
 - Testes automatizados.
 - Versionamento da imagem Docker.
+- Autenticação AWS com GitHub Actions via OIDC e credenciais temporárias.
+- Controle de acesso de rede com Security Groups.
 
 ### Planejadas
 
 - Execução do container com usuário não privilegiado.
-- Gerenciamento seguro de credenciais.
-- Autenticação AWS com GitHub Actions via OIDC.
-- Princípio do menor privilégio com IAM.
+- Revisão do princípio do menor privilégio com IAM.
+- HTTPS com certificado ACM e restrição do acesso direto à tarefa.
 - Análise de vulnerabilidades em imagens Docker.
 - Gerenciamento de variáveis de ambiente.
 - Monitoramento e alertas operacionais.
@@ -451,6 +499,10 @@ A evolução do projeto incluirá práticas de Site Reliability Engineering para
 - Gerenciamento de imagens e containers.
 - Análise de logs e troubleshooting.
 - Fundamentos de DevOps e SRE.
+- Integração contínua com GitHub Actions.
+- Autenticação federada IAM/OIDC e troubleshooting.
+- Implantação de containers com ECR e ECS Fargate.
+- Configuração de VPC, Security Groups, Target Group e ALB.
 
 ## 👨‍💻 Autor
 
@@ -468,4 +520,4 @@ Licença a definir.
 
 **Status:** Em desenvolvimento.
 
-**Próxima etapa:** Implementação do pipeline CI/CD com GitHub Actions.
+**Próxima etapa:** Associar o ALB ao serviço ECS, validar Health Check e DNS, e evoluir para deploy automatizado e observabilidade.
